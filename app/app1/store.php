@@ -34,8 +34,11 @@ class redisClient implements storeInterface
         return self::$_static;
     }
 
-    public function set($key, $value = null)
+    public function set($key, $value = null, $exprie = 0)
     {
+        if($exprie > 0){
+            return $this->client($key)->setEx($key, $exprie, $value);
+        }
         return $this->client($key)->set($key, $value);
     }
 
