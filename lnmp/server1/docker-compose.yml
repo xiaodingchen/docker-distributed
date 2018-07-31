@@ -1,0 +1,55 @@
+version: "3"
+services:
+  mysql:
+    #image: mysql:5.7
+    build: 
+      context: ./services/mysql
+      dockerfile: Dockerfile
+    environment: 
+      MYSQL_ROOT_PASSWORD: "root"
+      MYSQL_DATABASE: "app1"
+      MYSQL_USER: "app1"
+      MYSQL_PASSWORD: "123456"
+    volumes:
+      - ./services/mysql/data:/var/lib/mysql
+    ports:
+      - "6307:3306"
+    networks:
+      - docker-disnet
+  redis:
+    image: redis:4.0.2
+    ports:
+      - "6479:6379"
+    networks:
+      - docker-disnet
+  php:
+    build: 
+      context: ./services/php
+      dockerfile: Dockerfile
+    volumes:
+      - ../../app/app1:/www/html/app
+    ports:
+      - "9091:9000"
+    networks:
+      - docker-disnet
+  nginx:
+    image: nginx:1.12.2
+    ports:
+      - "8081:80"
+    depends_on:
+      - php
+    volumes:
+      - ./services/nginx/config:/etc/nginx/conf.d
+      - ./services/nginx/logs:/etc/nginx/logs/
+      - ../../app/app1:/www/html/app
+    networks:
+      - docker-disnet
+
+volumes:
+ mysql:
+   driver: local
+networks:
+  default:
+    external: false
+  docker-disnet:
+    external: true
