@@ -1,0 +1,45 @@
+version: "3"
+services:
+  elasticsearch1:
+    image: elasticsearch
+    container_name: es1
+    ports:
+      - 9220:9200
+      - 9320:9300
+    volumes:
+      - ./data/es1:/usr/share/elasticsearch/data
+      - ./config/es1.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+    networks:
+      - docker-disnet
+  # elasticsearch2:
+  #   image: elasticsearch
+  #   container_name: es2
+  #   ports:
+  #     - 9222:9200
+  #     - 9322:9300
+  #   volumes:
+  #     - ./data/es2:/usr/share/elasticsearch/data
+  #     - ./config/es2.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+  #   networks:
+  #     - docker-disnet
+  kibana:
+      image: kibana
+      environment:
+        SERVER_NAME: kibana
+        ELASTICSEARCH_URL: http://es1:9200
+      ports:
+        - 9221:5601
+      depends_on:
+      - elasticsearch1
+      networks:
+        - docker-disnet
+networks:
+  default:
+    external: false
+  docker-disnet:
+    external: true
+volumes:
+  elasticsearch1:
+    driver: local
+  # elasticsearch2:
+  #   driver: local
